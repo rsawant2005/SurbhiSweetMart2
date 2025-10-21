@@ -1,6 +1,11 @@
+import * as dotenv from 'dotenv'
+import * as path from 'path'
 import * as readline from 'readline'
 import { connectToDatabase, User } from '../lib/db'
 import { hashPassword } from '../lib/auth'
+
+// Load environment variables from .env.local
+dotenv.config({ path: path.join(__dirname, '..', '.env.local') })
 
 // Create readline interface for prompts
 const rl = readline.createInterface({
