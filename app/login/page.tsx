@@ -5,9 +5,11 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { setUser } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -33,6 +35,7 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include", // Include cookies
       })
 
       const data = await response.json()
@@ -42,9 +45,8 @@ export default function LoginPage() {
         return
       }
 
-      // Store token and user info
-      localStorage.setItem("auth_token", data.token)
-      localStorage.setItem("user", JSON.stringify(data.user))
+      // Store user in auth context (cookies are set by API)
+      setUser(data.user)
 
       // Redirect to dashboard
       router.push("/dashboard")
