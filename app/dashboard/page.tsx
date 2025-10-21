@@ -4,44 +4,11 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { LogOut, ShoppingCart, Heart, Settings } from "lucide-react"
-
-interface User {
-  id: string
-  name: string
-  email: string
-}
+import { useAuth } from "@/lib/auth-context"
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Check if user is authenticated
-    const token = localStorage.getItem("auth_token")
-    const userData = localStorage.getItem("user")
-
-    if (!token || !userData) {
-      router.push("/login")
-      return
-    }
-
-    try {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
-    } catch (err) {
-      console.error("[v0] Error parsing user data:", err)
-      router.push("/login")
-    } finally {
-      setLoading(false)
-    }
-  }, [router])
-
-  const handleLogout = () => {
-    localStorage.removeItem("auth_token")
-    localStorage.removeItem("user")
-    router.push("/login")
-  }
+  const { user, loading, logout } = useAuth()
 
   if (loading) {
     return (
@@ -65,7 +32,7 @@ export default function DashboardPage() {
             <p className="text-amber-700">Manage your Surbhi Sweet Mart account</p>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-serif rounded-lg transition-colors duration-200"
           >
             <LogOut className="w-5 h-5" />
