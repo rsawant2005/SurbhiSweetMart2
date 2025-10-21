@@ -7,9 +7,11 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/lib/auth-context"
 
 export default function AdminLogin() {
   const router = useRouter()
+  const { setUser } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -21,10 +23,11 @@ export default function AdminLogin() {
     setLoading(true)
 
     try {
-      const response = await fetch("/api/admin/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include", // Include cookies
       })
 
       const data = await response.json()
@@ -34,8 +37,16 @@ export default function AdminLogin() {
         return
       }
 
-      localStorage.setItem("adminToken", data.token)
-      localStorage.setItem("adminUser", JSON.stringify(data.user))
+      // Check if user has admin role
+      if (data.user.role !== 'admin') {
+        setError("Admin access required")
+        return
+      }
+
+      // Store user in auth context (cookies are set by API)
+      setUser(data.user)
+
+      // Redirect to admin dashboard
       router.push("/admin/dashboard")
     } catch (err) {
       setError("An error occurred. Please try again.")
@@ -57,7 +68,7 @@ export default function AdminLogin() {
               <label className="text-sm font-medium text-foreground">Email</label>
               <Input
                 type="email"
-                placeholder="admin@surbhi.com"
+                placeholder="admin@surbhisweetmart.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -79,9 +90,9 @@ export default function AdminLogin() {
             </Button>
           </form>
           <div className="mt-4 p-3 bg-blue-50 rounded text-sm text-blue-700">
-            <p className="font-semibold">Demo Credentials:</p>
-            <p>Email: admin@surbhi.com</p>
-            <p>Password: admin123</p>
+            <p className="font-semibold">Note:</p>
+            <p>Admin account must be created using the seed script.</p>
+            <p>Run: npm run seed:admin</p>
           </div>
         </CardContent>
       </Card>
