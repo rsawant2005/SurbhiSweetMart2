@@ -5,22 +5,14 @@ import { useRouter } from "next/navigation"
 import AdminSidebar from "@/components/admin/admin-sidebar"
 import AdminHeader from "@/components/admin/admin-header"
 import CategoriesManager from "@/components/admin/categories-manager"
+import { useAuth } from "@/lib/auth-context"
 
 export default function CategoriesPage() {
   const router = useRouter()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { user, loading } = useAuth()
 
-  useEffect(() => {
-    const token = localStorage.getItem("adminToken")
-    if (!token) {
-      router.push("/admin/login")
-    } else {
-      setIsAuthenticated(true)
-    }
-  }, [router])
-
-  if (!isAuthenticated) {
-    return null
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
 
   return (
