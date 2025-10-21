@@ -1,58 +1,72 @@
-// In production, this would connect to MongoDB
+import mongoose from 'mongoose'
 
-interface User {
-  _id: string
-  name: string
-  email: string
-  password: string
-  token?: string
-  lastLogin?: Date
-  createdAt: Date
-}
+// MongoDB connection
+export async function connectToDatabase(): Promise<void> {
+  // Check if already connected
+  if (mongoose.connection.readyState === 1) {
+    return
+  }
 
-// In-memory store for preview environment
-const mockUsers: Map<string, User> = new Map()
+  try {
+    const mongoUri = process.env.MONGODB_URI
 
-export async function connectToDatabase() {
-  // Mock implementation - returns a dummy client
-  return { connected: true }
-}
+    if (!mongoUri) {
+      throw new Error('MONGODB_URI environment variable is not defined')
+    }
 
-export async function getDatabase() {
-  return {
-    collection: (name: string) => {
-      if (name === "users") {
-        return {
-          findOne: async (query: Record<string, any>) => {
-            for (const user of mockUsers.values()) {
-              if (query.email && user.email === query.email) {
-                return user
-              }
-              if (query._id && user._id === query._id) {
-                return user
-              }
-            }
-            return null
-          },
-          insertOne: async (data: Omit<User, "_id">) => {
-            const id = Date.now().toString()
-            const user: User = { ...data, _id: id }
-            mockUsers.set(id, user)
-            return { insertedId: id }
-          },
-          updateOne: async (query: Record<string, any>, update: Record<string, any>) => {
-            for (const user of mockUsers.values()) {
-              if (query._id && user._id === query._id) {
-                const updateData = update.$set || update
-                Object.assign(user, updateData)
-                return { modifiedCount: 1 }
-              }
-            }
-            return { modifiedCount: 0 }
-          },
-        }
-      }
-      return {}
-    },
+    await mongoose.connect(mongoUri)
+    console.log('MongoDB connected successfully')
+  } catch (error) {
+    console.error('MongoDB connection error:', error)
+    throw error
   }
 }
+
+export function getDatabase(): mongoose.Connection {
+  if (mongoose.connection.readyState === 0) {
+    throw new Error('Database not connected. Call connectToDatabase() first.')
+  }
+  return mongoose.connection
+}
+
+// User Schema
+const UserSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
+  refreshToken: {
+    type: String,
+    default: null,
+  },
+  refreshTokenExpiry: {
+    type: Date,
+    default: null,
+  },
+  lastLogin: {
+    type: Date,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+})
+
+// Export User Model (handles Next.js hot reload)
+export const User = mongoose.models.User || mongoose.model('User', UserSchema)
