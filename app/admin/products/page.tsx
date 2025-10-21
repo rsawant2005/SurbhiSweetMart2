@@ -6,23 +6,15 @@ import AdminSidebar from "@/components/admin/admin-sidebar"
 import AdminHeader from "@/components/admin/admin-header"
 import ProductsTable from "@/components/admin/products-table"
 import { allProducts } from "@/lib/products"
+import { useAuth } from "@/lib/auth-context"
 
 export default function ProductsPage() {
   const router = useRouter()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { user, loading } = useAuth()
   const [products, setProducts] = useState(allProducts)
 
-  useEffect(() => {
-    const token = localStorage.getItem("adminToken")
-    if (!token) {
-      router.push("/admin/login")
-    } else {
-      setIsAuthenticated(true)
-    }
-  }, [router])
-
-  if (!isAuthenticated) {
-    return null
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
 
   return (
