@@ -1,59 +1,97 @@
 "use client"
 
-import type React from "react"
+import { createContext, useContext, useEffect, useState, ReactNode } from "react"
 
-import { createContext, useContext, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-
-interface User {
-  id: string
+type User = {
+  _id: string
   name: string
   email: string
 }
 
-interface AuthContextType {
+type AuthContextType = {
   user: User | null
   loading: boolean
-  logout: () => void
+  login: (email: string, password: string) => Promise<void>
+  signup: (name: string, email: string, password: string) => Promise<void>
+  googleAuth: (name: string, email: string) => Promise<void>
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token")
-    const userData = localStorage.getItem("user")
-
-    if (token && userData) {
+    const fetchUser = async () => {
       try {
-        setUser(JSON.parse(userData))
-      } catch (err) {
-        console.error("[v0] Error parsing user data:", err)
-        localStorage.removeItem("auth_token")
-        localStorage.removeItem("user")
+        const res = await fetch(`${API_URL}/api/user/current`, { credentials: "include" })
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data.user)
+        }
+      } catch {
+        setUser(null)
+      } finally {
+        setLoading(false)
       }
     }
-    setLoading(false)
-  }, [])
+    fetchUser()
+  }, [API_URL])
 
-  const logout = () => {
-    localStorage.removeItem("auth_token")
-    localStorage.removeItem("user")
-    setUser(null)
-    router.push("/login")
+  const login = async (email: string, password: string) => {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || "Login failed")
+    setUser(data.user)
   }
 
-  return <AuthContext.Provider value={{ user, loading, logout }}>{children}</AuthContext.Provider>
+  const signup = async (name: string, email: string, password: string) => {
+    const res = await fetch(`${API_URL}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ name, email, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || "Sign up failed")
+    setUser(data.user)
+  }
+
+  const googleAuth = async (name: string, email: string) => {
+    const res = await fetch(`${API_URL}/api/auth/googlelogin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ name, email }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || "Google login failed")
+    setUser(data.user)
+  }
+
+  const logout = async () => {
+    await fetch(`${API_URL}/api/auth/logout`, { method: "GET", credentials: "include" })
+    setUser(null)
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, loading, login, signup, googleAuth, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
-export function useAuth() {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within AuthProvider")
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider")
   return context
 }

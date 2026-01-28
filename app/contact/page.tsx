@@ -139,7 +139,7 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-serif text-amber-900 mb-1">Phone</h3>
-                    <p className="text-amber-800">+91 (123) 456-7890</p>
+                    <p className="text-amber-800">+91 9403612881</p>
                   </div>
                 </div>
 
@@ -160,7 +160,7 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-serif text-amber-900 mb-1">Email</h3>
-                    <p className="text-amber-800">info@surbhisweetmart.com</p>
+                    <p className="text-amber-800">surbhi@sweetmart.com</p>
                   </div>
                 </div>
 
@@ -188,9 +188,9 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-serif text-amber-900 mb-1">Address</h3>
                     <p className="text-amber-800">
-                      123 Sweet Lane, Bakery District
+                      Mumbai Goa Road, Kankavli,
                       <br />
-                      Mumbai, Maharashtra 400001
+                      Sindhudurg-416602 
                     </p>
                   </div>
                 </div>

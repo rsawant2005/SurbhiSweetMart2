@@ -74,7 +74,7 @@ export default function BestSellerSection() {
                   )}
                 </div>
 
-                {/* Add to Cart Button */}
+                {/* Add to Cart Button
                 <button className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200">
                   <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -85,7 +85,7 @@ export default function BestSellerSection() {
                     />
                   </svg>
                   Add to Cart
-                </button>
+                </button> */}
               </div>
             </div>
           ))}

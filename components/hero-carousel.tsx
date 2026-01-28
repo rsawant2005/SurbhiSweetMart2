@@ -8,15 +8,15 @@ const SWEETS_IMAGES = [
     alt: "Assorted Indian sweets and mithai",
   },
   {
-    src: "/sweets-carousel-2.jpg",
+    src: "https://www.shutterstock.com/image-photo/three-chocolates-cake-chocolate-drips-600nw-1921040348.jpg",
     alt: "Colorful traditional sweets collection",
   },
   {
-    src: "/sweets-carousel-3.jpg",
+    src: "https://t4.ftcdn.net/jpg/02/08/38/95/360_F_208389537_XYn1ukJfse2kVLxJYJpiBcjEkAHrWfBt.jpg",
     alt: "Premium sweets hamper display",
   },
   {
-    src: "/sweets-carousel-4.jpg",
+    src: "https://sharmanjainsweets.com/cdn/shop/articles/Untitled_design_eb07557c-e535-4bdf-9063-8a1f1cffa58c.png?v=1751535882",
     alt: "Delicious Indian desserts and treats",
   },
 ]

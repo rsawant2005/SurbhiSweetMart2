@@ -1,30 +1,20 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth-context"
 
+import { useCart } from "@/lib/cart-context"
+
 export default function Header() {
-  const [isShopOpen, setIsShopOpen] = useState(false)
-  const [shopTimeout, setShopTimeout] = useState<NodeJS.Timeout | null>(null)
   const { user, logout } = useAuth()
+  const { cartCount } = useCart()
 
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Collection", href: "/collection" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
-  ]
-
-  const shopCategories = [
-    { name: "Our Collection", href: "/shop?category=collection" },
-    { name: "Our Best Sellers", href: "/shop?category=bestsellers" },
-    { name: "Snacks And Savories", href: "/shop?category=snacks" },
-    { name: "In House Bakes", href: "/shop?category=bakes" },
-    { name: "Cakes", href: "/shop?category=cakes" },
-    { name: "Sweets", href: "/shop?category=sweets" },
-    { name: "Namkeen", href: "/shop?category=namkeen" },
   ]
 
   const handleShopMouseEnter = () => {
@@ -69,47 +59,37 @@ export default function Header() {
             </a>
           ))}
 
-          <div className="relative" onMouseEnter={handleShopMouseEnter} onMouseLeave={handleShopMouseLeave}>
-            <a
-              href="/shop"
-              className="text-amber-100 hover:text-amber-300 transition-colors duration-200 font-serif text-base"
-            >
-              Shop
-            </a>
-
-            {/* Dropdown Menu */}
-            {isShopOpen && (
-              <div className="absolute top-full left-0 mt-2 w-56 bg-amber-800 rounded-lg shadow-lg py-2 border border-amber-700">
-                {shopCategories.map((category) => (
-                  <Link
-                    key={category.name}
-                    href={category.href}
-                    className="block px-4 py-3 text-amber-100 hover:bg-amber-700 hover:text-amber-300 transition-colors duration-200 font-serif text-sm"
-                  >
-                    {category.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          <a
+            href="/shop"
+            className="text-amber-100 hover:text-amber-300 transition-colors duration-200 font-serif text-base"
+          >
+            Shop
+          </a>
         </nav>
 
-        <div className="hidden md:flex gap-4 items-center">
+        <div className="hidden md:flex gap-8 items-center">
           {/* Cart Button */}
-          <button className="flex items-center gap-2 px-4 py-2 text-amber-100 hover:text-amber-300 transition-colors duration-200">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <span className="text-base font-serif">Cart</span>
-          </button>
+          <Link href="/cart">
+            <button className="flex items-center gap-2 px-4 py-2 text-amber-100 hover:text-amber-300 transition-colors duration-200">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <span className="text-base font-serif">Cart</span>
+              {cartCount > 0 && (
+                <span className="ml-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </Link>
 
           {user ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-8">
               <div className="flex flex-col items-end">
                 <p className="text-amber-100 font-serif text-sm">{user.name}</p>
                 <Link href="/dashboard" className="text-amber-300 hover:text-amber-200 text-xs font-serif">
@@ -134,7 +114,7 @@ export default function Header() {
           ) : (
             <Link href="/login">
               <button className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-amber-50 rounded-lg transition-colors duration-200 font-serif text-base">
-                Sign In
+                Login
               </button>
             </Link>
           )}

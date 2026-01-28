@@ -5,7 +5,7 @@ const categories = [
     id: 1,
     name: "Premium",
     description: "Exquisite selection of our finest handcrafted sweets",
-    image: "/premium-sweets-collection.jpg",
+    image: "https://cdn.igp.com/f_auto,q_auto,t_pnopt19prodlp/products/p-premium-gourmet-sweets-gift-box-151091-m.jpg",
   },
   {
     id: 2,
@@ -23,7 +23,7 @@ const categories = [
     id: 4,
     name: "Kokan Specials",
     description: "Traditional Kokan region specialties and delicacies",
-    image: "/kokan-special-sweets.jpg",
+    image: "https://peekncooksa.blob.core.windows.net/tall-recipe/puran-poli.jpg",
   },
 ]
 
@@ -31,7 +31,7 @@ export default function CategoriesSection() {
   return (
     <section className="py-20 px-6 md:px-12 bg-amber-50">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
+         {/* {Section Header} */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-serif text-amber-900 mb-4">Our Collections</h2>
           <p className="text-lg text-amber-700 max-w-2xl mx-auto">

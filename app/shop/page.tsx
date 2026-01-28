@@ -1,29 +1,34 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useMemo } from "react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { useSearchParams } from "next/navigation"
 import { allProducts } from "@/lib/products"
 
+import { useCart } from "@/lib/cart-context"
+
 export default function ShopPage() {
   const searchParams = useSearchParams()
   const categoryFilter = searchParams.get("category")
-  const [sortBy, setSortBy] = useState("popular")
+  const { addToCart } = useCart()
+
+  const shopCategories = [
+    { name: "Our Collection", href: "/shop?category=collection" },
+    { name: "Our Best Sellers", href: "/shop?category=bestsellers" },
+    { name: "Snacks And Savories", href: "/shop?category=snacks" },
+    { name: "In House Bakes", href: "/shop?category=bakes" },
+    { name: "Cakes", href: "/shop?category=cakes" },
+    { name: "Sweets", href: "/shop?category=sweets" },
+    { name: "Namkeen", href: "/shop?category=namkeen" },
+  ]
+
 
   const filteredProducts = useMemo(() => {
     let products = categoryFilter ? allProducts.filter((p) => p.category === categoryFilter) : allProducts
 
-    if (sortBy === "price-low") {
-      products = [...products].sort((a, b) => a.price - b.price)
-    } else if (sortBy === "price-high") {
-      products = [...products].sort((a, b) => b.price - a.price)
-    } else if (sortBy === "rating") {
-      products = [...products].sort((a, b) => b.rating - a.rating)
-    }
-
     return products
-  }, [categoryFilter, sortBy])
+  }, [categoryFilter])
 
   const categoryNames = {
     collection: "Our Collection",
@@ -41,7 +46,7 @@ export default function ShopPage() {
 
       {/* Shop Header */}
       <section className="pt-32 pb-12 px-6 md:px-12 bg-gradient-to-b from-amber-100 to-amber-50">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-serif text-amber-900 mb-4">
             {categoryFilter ? categoryNames[categoryFilter as keyof typeof categoryNames] : "All Products"}
           </h1>
@@ -52,21 +57,26 @@ export default function ShopPage() {
       {/* Filters and Products */}
       <section className="py-12 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">
-          {/* Sort Options */}
-          <div className="mb-8 flex justify-between items-center">
-            <div className="flex gap-4">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-amber-300 rounded-lg bg-white text-amber-900 font-serif"
-              >
-                <option value="popular">Most Popular</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-              </select>
+          {/* Categories */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-serif text-amber-900 mb-4 text-center">Categories</h2>
+            <div className="flex flex-wrap gap-4 justify-center">
+              {shopCategories.map((category) => (
+                <a
+                  key={category.name}
+                  href={category.href}
+                  className={`px-4 py-2 rounded-lg font-serif ${
+                    categoryFilter === category.href.split("=")[1]
+                      ? "bg-amber-600 text-white"
+                      : "bg-white text-amber-900 border border-amber-300 hover:bg-amber-100"
+                  }`}
+                >
+                  {category.name}
+                </a>
+              ))}
             </div>
           </div>
+
 
           {/* Products Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -106,8 +116,16 @@ export default function ShopPage() {
 
                   {/* Price */}
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-serif text-amber-900">₹{product.price}</span>
-                    <button className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors duration-200 font-serif text-sm">
+                    <div>
+                      <span className="text-2xl font-serif text-amber-900">₹{product.price}</span>
+                    <span className="text-s font-serif text-amber-900 px-2" >per KG</span>
+                    </div>
+                    {/* <span className="text-2xl font-serif text-amber-900">₹{product.price}</span>
+                    <p className="text-s font-serif text-amber-900">per KG</p> */}
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors duration-200 font-serif text-sm"
+                    >
                       Add to Cart
                     </button>
                   </div>

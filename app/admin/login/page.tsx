@@ -19,6 +19,7 @@ export default function AdminLogin() {
     e.preventDefault()
     setError("")
     setLoading(true)
+    console.log("Attempting to login with:", { email, password })
 
     try {
       const response = await fetch("/api/admin/login", {
@@ -28,16 +29,20 @@ export default function AdminLogin() {
       })
 
       const data = await response.json()
+      console.log("Login response data:", data)
 
       if (!response.ok) {
+        console.error("Login failed with status:", response.status)
         setError(data.message || "Login failed")
         return
       }
 
+      console.log("Login successful, storing token and user.")
       localStorage.setItem("adminToken", data.token)
       localStorage.setItem("adminUser", JSON.stringify(data.user))
       router.push("/admin/dashboard")
     } catch (err) {
+      console.error("An error occurred during login:", err)
       setError("An error occurred. Please try again.")
     } finally {
       setLoading(false)
